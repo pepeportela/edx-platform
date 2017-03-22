@@ -108,24 +108,37 @@ class ComponentVisibilityEditorView(BaseComponentEditorView):
     """
     A :class:`.PageObject` representing the rendered view of a component visibility editor.
     """
-    OPTION_SELECTOR = '.modal-section-content .field'
+    OPTION_SELECTOR = '.partition-group-control .field'
 
     @property
     def all_options(self):
         """
-        Return all visibility options.
+        Return all partition groups.
         """
         return self.q(css=self._bounded_selector(self.OPTION_SELECTOR)).results
 
     @property
-    def selected_options(self):
+    def selected_partition_scheme(self):
         """
-        Return all selected visibility options.
+        Return the selected partition scheme
+        (or "All Learners and Staff" is no partitioning is selected).
+        """
+        select = self.q(css=self._bounded_selector('.partition-visibility select')).results[0]
+        return Select(select).first_selected_option.text
+
+    def select_partition_scheme(self, partition_name):
+        select = self.q(css=self._bounded_selector('.partition-visibility select')).results[0]
+        Select(select).select_by_visible_text(partition_name)
+
+    @property
+    def selected_groups(self):
+        """
+        Return all selected partition groups.
         """
         results = []
         for option in self.all_options:
-            button = option.find_element_by_css_selector('input.input')
-            if button.is_selected():
+            checkbox = option.find_element_by_css_selector('input')
+            if checkbox.is_selected():
                 results.append(option)
         return results
 

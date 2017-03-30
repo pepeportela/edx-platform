@@ -134,7 +134,7 @@ class EnrollmentTrackPartitionScheme(object):
         Any group access rule referencing inactive partitions will be ignored
         when performing access checks.
         """
-        return EnrollmentTrackUserPartition(id, name, description, [], cls, parameters, active)
+        return EnrollmentTrackUserPartition(id, unicode(name), unicode(description), [], cls, parameters, active)
 
 
 def is_course_using_cohort_instead(course_key):

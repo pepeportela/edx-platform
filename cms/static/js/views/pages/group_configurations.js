@@ -14,9 +14,14 @@ function($, _, gettext, BasePage, GroupConfigurationsListView, ContentGroupListV
                     collection: this.experimentGroupConfigurations
                 });
             }
+
             this.contentGroupConfiguration = options.contentGroupConfiguration;
+            this.enrollmentTrackConfiguration = options.enrollmentTrackConfiguration;
             this.cohortGroupsListView = new ContentGroupListView({
                 collection: this.contentGroupConfiguration.get('groups')
+            });
+            this.enrollmentGroupListView = new ContentGroupListView({
+                collection: this.enrollmentTrackConfiguration.get('groups')
             });
         },
 
@@ -26,6 +31,8 @@ function($, _, gettext, BasePage, GroupConfigurationsListView, ContentGroupListV
                 this.$('.wrapper-groups.experiment-groups').append(this.experimentGroupsListView.render().el);
             }
             this.$('.wrapper-groups.content-groups').append(this.cohortGroupsListView.render().el);
+            this.$('.wrapper-groups.enrollment-tracks').append(this.enrollmentGroupListView.render().el);
+
             this.addWindowActions();
             if (hash) {
                 // Strip leading '#' to get id string to match

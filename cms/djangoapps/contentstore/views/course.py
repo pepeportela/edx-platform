@@ -97,8 +97,8 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError
+from xmodule.partitions.partitions_service import get_course_user_partitions
 from xmodule.tabs import CourseTab, CourseTabList, InvalidTabsException
-
 
 log = logging.getLogger(__name__)
 
@@ -1521,15 +1521,18 @@ def group_configurations_list_handler(request, course_key_string):
             else:
                 experiment_group_configurations = None
 
-            content_group_configuration = GroupConfiguration.get_or_create_content_group(store, course)
-
+            # content_group_configuration = GroupConfiguration.get_or_create_content_group(store, course)
+            configurations = get_course_user_partitions(course=course)
+            content_group_configuration = configurations[0].to_json()
+            enrollment_track_configuration = configurations[1].to_json()
             return render_to_response('group_configurations.html', {
                 'context_course': course,
                 'group_configuration_url': group_configuration_url,
                 'course_outline_url': course_outline_url,
                 'experiment_group_configurations': experiment_group_configurations,
                 'should_show_experiment_groups': should_show_experiment_groups,
-                'content_group_configuration': content_group_configuration
+                'content_group_configuration': content_group_configuration,
+                'enrollment_track_configuration': enrollment_track_configuration
             })
         elif "application/json" in request.META.get('HTTP_ACCEPT'):
             if request.method == 'POST':

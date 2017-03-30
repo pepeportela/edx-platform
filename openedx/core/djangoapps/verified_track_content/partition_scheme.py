@@ -47,11 +47,18 @@ class EnrollmentTrackUserPartition(UserPartition):
 
     def to_json(self):
         """
-        Because this partition is dynamic, to_json and from_json are not supported.
-
-        Calling this method will raise a TypeError.
+        Returns the EnrollmentPartition information in a JSON format.
         """
-        raise TypeError("Because EnrollmentTrackUserPartition is a dynamic partition, 'to_json' is not supported.")
+        return {
+            "id": self.id,
+            "name": self.name,
+            "scheme": self.scheme.name,
+            "description": self.description,
+            "parameters": self.parameters,
+            "groups": [g.to_json() for g in self.groups],
+            "active": bool(self.active),
+            "version": UserPartition.VERSION
+        }
 
     def from_json(self):
         """

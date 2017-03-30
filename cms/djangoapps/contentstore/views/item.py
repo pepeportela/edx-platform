@@ -23,6 +23,8 @@ from pytz import UTC
 from xblock.core import XBlock
 from xblock.fields import Scope
 from xblock.fragment import Fragment
+
+from xblock_config.models import LTIConsumerHideFieldsFlag
 from xblock_django.user_service import DjangoXBlockUserService
 
 from cms.lib.xblock.authoring_mixin import VISIBILITY_VIEW
@@ -51,6 +53,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore.inheritance import own_metadata
+from xmodule.services import ConfigurationService
 from xmodule.tabs import CourseTabList
 from xmodule.x_module import PREVIEW_VIEWS, STUDIO_VIEW, STUDENT_VIEW, DEPRECATION_VSCOMPAT_EVENT
 
@@ -266,6 +269,8 @@ class StudioEditModuleRuntime(object):
                 return DjangoXBlockUserService(self._user)
             if service_name == "studio_user_permissions":
                 return StudioPermissionsService(self._user)
+            if service_name == "lti-configuration":
+                return ConfigurationService(LTIConsumerHideFieldsFlag)
         return None
 
 

@@ -5,7 +5,6 @@ from logging import getLogger
 
 from openedx.core.lib.cache_utils import memoized
 from xblock.core import XBlock
-from xmodule.block_metadata_utils import display_name_with_default_escaped
 from xmodule.graders import ProblemScore
 from .transformer import GradesTransformer
 
@@ -102,7 +101,7 @@ def get_score(submissions_scores, csm_scores, persisted_block, block):
 
     # Priority order for retrieving the scores:
     # submissions API -> CSM -> grades persisted block -> latest block content
-    raw_earned, raw_possible, weighted_earned, weighted_possible, attempted = (
+    raw_earned, raw_possible, weighted_earned, weighted_possible, attempted, first_attempted = (
         _get_score_from_submissions(submissions_scores, block) or
         _get_score_from_csm(csm_scores, block, weight) or
         _get_score_from_persisted_or_latest_block(persisted_block, block, weight)
@@ -123,6 +122,7 @@ def get_score(submissions_scores, csm_scores, persisted_block, block):
             weight,
             graded,
             attempted=attempted,
+            first_attempted=first_attempted,
         )
 
 
@@ -151,9 +151,11 @@ def _get_score_from_submissions(submissions_scores, block):
         submission_value = submissions_scores.get(unicode(block.location))
         if submission_value:
             attempted = True
-            weighted_earned, weighted_possible = submission_value
+            # weighted_earned, weighted_possible = submission_value
+            weighted_earned = submission_value.points_earned
+            weighted_possible = submission_value.points_possible
             assert weighted_earned >= 0.0 and weighted_possible > 0.0  # per contract from submissions API
-            return (None, None) + (weighted_earned, weighted_possible) + (attempted,)
+            return (None, None) + (weighted_earned, weighted_possible) + (attempted, submission_value.created_at)
 
 
 def _get_score_from_csm(csm_scores, block, weight):
@@ -182,7 +184,7 @@ def _get_score_from_csm(csm_scores, block, weight):
             attempted = False
             raw_earned = 0.0
         raw_possible = score.total
-        return (raw_earned, raw_possible) + weighted_score(raw_earned, raw_possible, weight) + (attempted,)
+        return (raw_earned, raw_possible) + weighted_score(raw_earned, raw_possible, weight) + (attempted, score.created)
 
 
 def _get_score_from_persisted_or_latest_block(persisted_block, block, weight):
@@ -194,6 +196,7 @@ def _get_score_from_persisted_or_latest_block(persisted_block, block, weight):
     """
     raw_earned = 0.0
     attempted = False
+    first_attempted = None
 
     if persisted_block:
         raw_possible = persisted_block.raw_possible
@@ -206,7 +209,7 @@ def _get_score_from_persisted_or_latest_block(persisted_block, block, weight):
     else:
         weighted_scores = weighted_score(raw_earned, raw_possible, weight)
 
-    return (raw_earned, raw_possible) + weighted_scores + (attempted,)
+    return (raw_earned, raw_possible) + weighted_scores + (attempted, first_attempted)
 
 
 def _get_weight_from_block(persisted_block, block):

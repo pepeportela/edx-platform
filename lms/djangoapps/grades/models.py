@@ -373,10 +373,14 @@ class PersistentSubsectionGrade(DeleteGradesMixin, TimeStampedModel):
         )
 
         if attempted and not grade.first_attempted:
-            grade.first_attempted = now()
+            grade.first_attempted = cls.get_first_attempted(usage_key)
             grade.save()
         cls._emit_grade_calculated_event(grade)
         return grade
+
+    @classmethod
+    def get_first_attempted(cls, usage_key):
+        return now()
 
     @classmethod
     def create_grade(cls, **params):

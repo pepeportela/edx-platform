@@ -21,7 +21,8 @@ function($, _, gettext, BasePage, GroupConfigurationsListView, ContentGroupListV
                 collection: this.contentGroupConfiguration.get('groups')
             });
             this.enrollmentGroupListView = new ContentGroupListView({
-                collection: this.enrollmentTrackConfiguration.get('groups')
+                collection: this.enrollmentTrackConfiguration.get('groups'),
+                restrictEditing: true
             });
         },
 

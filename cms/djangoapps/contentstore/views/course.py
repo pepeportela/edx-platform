@@ -97,7 +97,6 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError
-from xmodule.partitions.partitions_service import get_all_partitions_for_course
 from xmodule.tabs import CourseTab, CourseTabList, InvalidTabsException
 
 log = logging.getLogger(__name__)
@@ -1521,10 +1520,16 @@ def group_configurations_list_handler(request, course_key_string):
             else:
                 experiment_group_configurations = None
 
-            # content_group_configuration = GroupConfiguration.get_or_create_content_group(store, course)
-            configurations = get_all_partitions_for_course(course=course)
-            content_group_configuration = configurations[0].to_json()
-            enrollment_track_configuration = configurations[1].to_json()
+            all_configurations = GroupConfiguration.get_all_content_groups(store, course)
+            content_group_configuration = {}
+            enrollment_track_configuration = {}
+
+            for config in all_configurations:
+                if config['scheme'] == 'cohort':
+                    content_group_configuration = config
+                elif config['scheme'] == 'enrollment_track':
+                    enrollment_track_configuration = config
+
             return render_to_response('group_configurations.html', {
                 'context_course': course,
                 'group_configuration_url': group_configuration_url,

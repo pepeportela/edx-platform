@@ -290,7 +290,7 @@ class GroupConfiguration(object):
         """
         all_configurations = get_all_partitions_for_course(course)
         for config in all_configurations:
-            if config is not None:
+            if config is not None and config.scheme.name != 'random':
                 for item in items:
                     if hasattr(item, 'group_access') and item.group_access:
                         group_ids = item.group_access.get(config.id, [])

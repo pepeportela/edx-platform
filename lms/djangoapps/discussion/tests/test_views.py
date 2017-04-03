@@ -34,7 +34,7 @@ from xmodule.modulestore.tests.django_utils import (
 )
 from xmodule.modulestore.tests.factories import check_mongo_calls, CourseFactory, ItemFactory
 
-from courseware.courses import UserNotEnrolled
+from courseware.exceptions import Redirect
 from nose.tools import assert_true
 from mock import patch, Mock, ANY, call
 
@@ -1574,7 +1574,7 @@ class EnrollmentTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         mock_request.side_effect = make_mock_request_impl(course=self.course, text='dummy')
         request = RequestFactory().get('dummy_url')
         request.user = self.student
-        with self.assertRaises(UserNotEnrolled):
+        with self.assertRaises(Redirect):
             views.forum_form_discussion(request, course_id=self.course.id.to_deprecated_string())
 
 

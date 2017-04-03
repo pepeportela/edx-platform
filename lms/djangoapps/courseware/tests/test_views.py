@@ -449,8 +449,8 @@ class ViewsTestCase(ModuleStoreTestCase):
         # Accessing the courseware url in which not enrolled & redirected to staff enrollment page
         response = self.client.get(courseware_url, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertIn(302, response.redirect_chain[0])
         self.assertEqual(len(response.redirect_chain), 1)
+        self.assertIn(302, response.redirect_chain[0])
         self.assertRedirects(response, enroll_url)
 
         # Accessing the enroll staff url and verify the correct url
@@ -463,8 +463,8 @@ class ViewsTestCase(ModuleStoreTestCase):
         # Post the valid data to enroll the staff in the course
         response = self.client.post(enroll_url, data={'enroll': "Enroll"}, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertIn(302, response.redirect_chain[0])
         self.assertEqual(len(response.redirect_chain), 1)
+        self.assertIn(302, response.redirect_chain[0])
         self.assertRedirects(response, courseware_url)
 
         # Verify staff has been enrolled to the given course
@@ -554,23 +554,6 @@ class ViewsTestCase(ModuleStoreTestCase):
         mock_user = MagicMock()
         mock_user.is_authenticated.return_value = False
         self.assertEqual(views.user_groups(mock_user), [])
-
-    def test_get_current_child(self):
-        mock_xmodule = MagicMock()
-        self.assertIsNone(views.get_current_child(mock_xmodule))
-
-        mock_xmodule.position = -1
-        mock_xmodule.get_display_items.return_value = ['one', 'two', 'three']
-        self.assertEqual(views.get_current_child(mock_xmodule), 'one')
-
-        mock_xmodule.position = 2
-        self.assertEqual(views.get_current_child(mock_xmodule), 'two')
-        self.assertEqual(views.get_current_child(mock_xmodule, requested_child='first'), 'one')
-        self.assertEqual(views.get_current_child(mock_xmodule, requested_child='last'), 'three')
-
-        mock_xmodule.position = 3
-        mock_xmodule.get_display_items.return_value = []
-        self.assertIsNone(views.get_current_child(mock_xmodule))
 
     def test_get_redirect_url(self):
         self.assertIn(
@@ -1439,17 +1422,17 @@ class ProgressPageTests(ModuleStoreTestCase):
         """Test that query counts remain the same for self-paced and instructor-paced courses."""
         SelfPacedConfiguration(enabled=self_paced_enabled).save()
         self.setup_course(self_paced=self_paced)
-        with self.assertNumQueries(41), check_mongo_calls(4):
+        with self.assertNumQueries(42), check_mongo_calls(4):
             self._get_progress_page()
 
     def test_progress_queries(self):
         self.setup_course()
-        with self.assertNumQueries(41), check_mongo_calls(4):
+        with self.assertNumQueries(42), check_mongo_calls(4):
             self._get_progress_page()
 
         # subsequent accesses to the progress page require fewer queries.
         for _ in range(2):
-            with self.assertNumQueries(27), check_mongo_calls(4):
+            with self.assertNumQueries(28), check_mongo_calls(4):
                 self._get_progress_page()
 
     @patch(

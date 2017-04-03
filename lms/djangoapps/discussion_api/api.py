@@ -17,6 +17,7 @@ from rest_framework.exceptions import PermissionDenied
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
 from courseware.courses import get_course_with_access
+from courseware.exceptions import Redirect
 
 from discussion_api.exceptions import ThreadNotFoundError, CommentNotFoundError, DiscussionDisabledError
 from discussion_api.forms import CommentActionsForm, ThreadActionsForm
@@ -80,6 +81,8 @@ def _get_course(course_key, user):
     try:
         course = get_course_with_access(user, 'load', course_key, check_if_enrolled=True)
     except Http404:
+        raise CourseNotFoundError("Course not found.")
+    except Redirect:
         raise CourseNotFoundError("Course not found.")
     if not any([tab.type == 'discussion' and tab.is_enabled(course, user) for tab in course.tabs]):
         raise DiscussionDisabledError("Discussion is disabled for the course.")

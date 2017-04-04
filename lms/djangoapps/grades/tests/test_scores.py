@@ -16,6 +16,9 @@ from openedx.core.djangoapps.content.block_structure.block_structure import Bloc
 from xmodule.graders import ProblemScore
 
 
+NOW = now()
+
+
 class TestScoredBlockTypes(TestCase):
     """
     Tests for the possibly_scored function.
@@ -39,8 +42,6 @@ class TestScoredBlockTypes(TestCase):
             usage_key = BlockUsageLocator(course_key, block_type, 'mock_block_id')
             self.assertTrue(scores.possibly_scored(usage_key))
 
-
-NOW = now()
 
 @ddt.ddt
 class TestGetScore(TestCase):

@@ -298,7 +298,6 @@ class GroupConfiguration(object):
                         for group_id in group_ids:
                             yield item, group_id
 
-
     @staticmethod
     def update_usage_info(store, course, configuration):
         """

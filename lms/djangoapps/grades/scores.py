@@ -150,7 +150,7 @@ def _get_score_from_submissions(submissions_scores, block):
     if submissions_scores:
         submission_value = submissions_scores.get(unicode(block.location))
         if submission_value:
-            attempted = True
+            attempted = submission_value.created_at is not None
             # weighted_earned, weighted_possible = submission_value
             weighted_earned = submission_value.points_earned
             weighted_possible = submission_value.points_possible
@@ -179,12 +179,15 @@ def _get_score_from_csm(csm_scores, block, weight):
     if has_valid_score:
         if score.correct is not None:
             attempted = True
+            first_attempted = score.created
             raw_earned = score.correct
         else:
             attempted = False
+            first_attempted = None
             raw_earned = 0.0
+
         raw_possible = score.total
-        return (raw_earned, raw_possible) + weighted_score(raw_earned, raw_possible, weight) + (attempted, score.created)
+        return (raw_earned, raw_possible) + weighted_score(raw_earned, raw_possible, weight) + (attempted, first_attempted)
 
 
 def _get_score_from_persisted_or_latest_block(persisted_block, block, weight):

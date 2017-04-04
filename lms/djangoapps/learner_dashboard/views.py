@@ -47,14 +47,14 @@ def program_listing(request):
 def program_details(request, program_uuid):
     """View details about a specific program."""
     programs_config = ProgramsApiConfig.current()
-    if not programs_config.enabled:
-        raise Http404
+    # if not programs_config.enabled:
+    #     raise Http404
 
-    program_data = get_programs(uuid=program_uuid)
-    if not program_data:
-        raise Http404
+    # program_data = get_programs(uuid=program_uuid)
+    # if not program_data:
+    #     raise Http404
 
-    program_data = ProgramDataExtender(program_data, request.user).extend()
+    # program_data = ProgramDataExtender(program_data, request.user).extend()
 
     urls = {
         'program_listing_url': reverse('program_listing_view'),
@@ -65,7 +65,7 @@ def program_details(request, program_uuid):
     }
 
     context = {
-        'program_data': program_data,
+        # 'program_data': program_data,
         'urls': urls,
         'show_program_listing': programs_config.enabled,
         'nav_hidden': True,
@@ -74,7 +74,7 @@ def program_details(request, program_uuid):
         'user_preferences': get_user_preferences(request.user)
     }
 
-    if waffle.switch_is_active('new_program_progress'):
-        return render_to_response('learner_dashboard/program_details_2017.html', context)
-    else:
-        return render_to_response('learner_dashboard/program_details.html', context)
+    # if waffle.switch_is_active('new_program_progress'):
+    return render_to_response('learner_dashboard/program_details_2017.html', context)
+    # else:
+        # return render_to_response('learner_dashboard/program_details.html', context)

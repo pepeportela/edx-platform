@@ -81,7 +81,7 @@ def program_details(request, program_uuid):
 
         context.update({
             'program_data': program_data,
-            'course_progress': course_progress,
+            'course_progress': course_progress
         })
 
         return render_to_response('learner_dashboard/program_details_2017.html', context)

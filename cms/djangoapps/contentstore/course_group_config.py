@@ -17,6 +17,7 @@ MINIMUM_GROUP_ID = MINIMUM_STATIC_PARTITION_ID
 
 RANDOM_SCHEME = "random"
 COHORT_SCHEME = "cohort"
+ENROLLMENT_SCHEME = "enrollment_track"
 
 # Note: the following content group configuration strings are not
 # translated since they are not visible to users.
@@ -290,7 +291,7 @@ class GroupConfiguration(object):
         """
         all_configurations = get_all_partitions_for_course(course)
         for config in all_configurations:
-            if config is not None and config.scheme.name != 'random':
+            if config is not None and config.scheme.name != RANDOM_SCHEME:
                 for item in items:
                     if hasattr(item, 'group_access') and item.group_access:
                         group_ids = item.group_access.get(config.id, [])
@@ -358,7 +359,7 @@ class GroupConfiguration(object):
     #             description=CONTENT_GROUP_CONFIGURATION_DESCRIPTION,
     #             groups=[],
     #             scheme_id=COHORT_SCHEME
-    #         )
+    #         ) 
     #         return content_group_configuration.to_json()
     #
     #     content_group_configuration = GroupConfiguration.update_content_group_usage_info(
@@ -367,6 +368,18 @@ class GroupConfiguration(object):
     #         content_group_configuration
     #     )
     #     return content_group_configuration
+
+    @staticmethod
+    def get_empty_user_partition(course, scheme):
+        content_group_configuration = UserPartition(
+          id=generate_int_id(MINIMUM_GROUP_ID, MYSQL_MAX_INT, GroupConfiguration.get_used_ids(course)),
+          name=CONTENT_GROUP_CONFIGURATION_NAME,
+          description=CONTENT_GROUP_CONFIGURATION_DESCRIPTION,
+          groups=[],
+          scheme_id=scheme
+        )
+        return content_group_configuration.to_json()
+
 
     @staticmethod
     def get_all_content_groups(store, course):
